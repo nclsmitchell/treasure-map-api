@@ -87,7 +87,7 @@ def get_turn(turn):
 
 
 @app.route('/map/final', methods=['POST'])
-def get_final_state():
+def get_final_state(turn):
     values = request.get_json()
 
     # Check that the required fields are in the POST'ed data

@@ -184,16 +184,16 @@ class RunTreasureMap(object):
 
         init_treasure_map = Treasure_map.get_treasure_map
         init_leaderboard = Treasure_map.get_leaderboard
+        turn_count = Treasure_map.get_turn_count
+        turn = 0
 
         self.turns[0] = {
             'treasures': treasures,
             'adventurers': adventurers,
             'treasure_map': init_treasure_map,
-            'leaderboard': init_leaderboard
+            'leaderboard': init_leaderboard,
+            'turn_count': turn_count
         }
-
-        turn_count = Treasure_map.get_turn_count
-        turn = 0
 
         while turn < turn_count:
             turn_treasures = []
@@ -253,7 +253,8 @@ class RunTreasureMap(object):
                 'treasures': turn_treasures,
                 'adventurers': turn_adventurers,
                 'treasure_map': new_treasure_map,
-                'leaderboard': new_leaderboard
+                'leaderboard': new_leaderboard,
+                'turn_count': turn_count
             }
 
             turn += 1
