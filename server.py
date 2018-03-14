@@ -4,10 +4,13 @@
 import os
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+
 from script import treasure_map
 
 # Instantiate Flask app
 app = Flask(__name__)
+cors = CORS(app)
 
 @app.route('/parse', methods=['POST'])
 def parse():
