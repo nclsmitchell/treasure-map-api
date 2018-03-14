@@ -9,6 +9,49 @@ from script import treasure_map
 # Instantiate Flask app
 app = Flask(__name__)
 
+@app.route('/parse', methods=['POST'])
+def parse():
+    values = request.get_json()
+
+    # Check that the required fields are in the POST'ed data
+    required = ['data']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    # Parse input value
+    def parsing(values):
+        output = {
+            'C': None,
+            'M': [],
+            'T': [],
+            'A': []
+        }
+        lines = values.split('\n')
+
+        for line in lines:
+            cells = line.split(' - ')
+            if cells[0] == 'C':
+                output['C'] = [int(cells[1]), int(cells[2])]
+            elif cells[0] == 'M':
+                output['M'].append([int(cells[1]), int(cells[2])])
+            elif cells[0] == 'T':
+                output['T'].append([int(cells[1]), int(cells[2]), int(cells[3])])
+            elif cells[0] == 'A':
+                output['A'].append({
+                    'name': cells[1],
+                    'position': [int(cells[2]), int(cells[3])],
+                    'direction': cells[4],
+                    'actions': cells[5],
+                })
+            else:
+                continue
+
+        return output
+
+    response = parsing(values['data'])
+
+    return jsonify(response), 200
+
 @app.route('/map/new', methods=['POST'])
 def new_map():
     values = request.get_json()
