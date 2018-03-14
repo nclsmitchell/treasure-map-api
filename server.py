@@ -55,8 +55,9 @@ def parse():
 
     return jsonify(response), 200
 
-@app.route('/map/new', methods=['POST'])
-def new_map():
+
+@app.route('/map/init', methods=['POST'])
+def get_init_state():
     values = request.get_json()
 
     # Check that the required fields are in the POST'ed data
@@ -65,26 +66,12 @@ def new_map():
         return 'Missing values', 400
 
     # Create a new Map
-    Treasure_map = treasure_map.TreasureMap(values['C'], values['M'], values['T'], values['A'])
-    response = Treasure_map.get_treasure_map()
-
-    return jsonify(response), 201
-
-@app.route('/map/run', methods=['POST'])
-def get_turns():
-    values = request.get_json()
-
-    # Check that the required fields are in the POST'ed data
-    required = ['C', 'M', 'T', 'A']
-    if not all(k in values for k in required):
-        return 'Missing values', 400
-
-    # Run treasure map
-    response = treasure_map.RunTreasureMap(values['C'], values['M'], values['T'], values['A']).get_turns
+    response = treasure_map.RunTreasureMap(values['C'], values['M'], values['T'], values['A']).get_init_state
 
     return jsonify(response), 200
 
-@app.route('/map/run/<path:turn>', methods=['POST'])
+
+@app.route('/map/turn/<path:turn>', methods=['POST'])
 def get_turn(turn):
     values = request.get_json()
 
@@ -95,6 +82,21 @@ def get_turn(turn):
 
     # Get treasure map at step `turn`
     response = treasure_map.RunTreasureMap(values['C'], values['M'], values['T'], values['A']).get_turn(turn)
+
+    return jsonify(response), 200
+
+
+@app.route('/map/final', methods=['POST'])
+def get_final_state():
+    values = request.get_json()
+
+    # Check that the required fields are in the POST'ed data
+    required = ['C', 'M', 'T', 'A']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    # Get treasure map at step `turn`
+    response = treasure_map.RunTreasureMap(values['C'], values['M'], values['T'], values['A']).get_final_state
 
     return jsonify(response), 200
 

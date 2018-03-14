@@ -182,6 +182,16 @@ class RunTreasureMap(object):
 
         Treasure_map = TreasureMap(dimensions, mountains, treasures, adventurers)
 
+        init_treasure_map = Treasure_map.get_treasure_map
+        init_leaderboard = Treasure_map.get_leaderboard
+
+        self.turns[0] = {
+            'treasures': treasures,
+            'adventurers': adventurers,
+            'treasure_map': init_treasure_map,
+            'leaderboard': init_leaderboard
+        }
+
         turn_count = Treasure_map.get_turn_count
         turn = 0
 
@@ -249,8 +259,12 @@ class RunTreasureMap(object):
             turn += 1
 
     @property
-    def get_turns(self):
-        return self.turns
+    def get_init_state(self):
+        return self.turns[0]
+
+    @property
+    def get_final_state(self):
+        return self.turns[len(self.turns) - 1]
 
     def get_turn(self, turn):
         return self.turns[int(turn)]
