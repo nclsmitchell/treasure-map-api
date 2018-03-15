@@ -232,7 +232,10 @@ class RunTreasureMap(object):
 
                 # Get adventurer state
                 position = Adventurer.position
-                action = Adventurer.get_turn_action(turn)
+                try:
+                    action = Adventurer.get_turn_action(turn)
+                except IndexError:
+                    continue
                 next_position = Adventurer.get_next_position(action)
 
                 # Get environment state
