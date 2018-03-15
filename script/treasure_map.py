@@ -66,10 +66,12 @@ class Treasure(object):
 
     def loot_treasure(self, position):
         self.count -= 1
-        if self.count == 0:
-            return ''
+        if self.count > 0:
+            return 'A({count})'.format(
+                count=self.count
+            )
         else:
-            return 'T'
+            return 'A'
 
 # Class handling treasure map behaviour
 class TreasureMap(object):
@@ -97,14 +99,17 @@ class TreasureMap(object):
 
         # Place treasures on treasure map
         for treasure in treasures:
-            new_treasure_map[treasure[1]][treasure[0]] = 'T'
+            new_treasure_map[treasure[1]][treasure[0]] = 'T({count})'.format(
+                count=treasure[2]
+            )
 
             position = [treasure[0], treasure[1]]
             new_Treasure = Treasure(position, treasure[2])
             self.Treasures.append(new_Treasure)
 
-        # Store adventurers position on treasure map
+        # Place adventurers position on treasure map
         for adventurer in adventurers:
+            new_treasure_map[adventurer['position'][1]][adventurer['position'][0]] = 'A'
             new_Adventurer = Adventurer(adventurer)
 
             self.Adventurers.append(new_Adventurer)
@@ -160,6 +165,15 @@ class TreasureMap(object):
     def update_content(self, position, content):
         self.treasure_map[position[1]][position[0]] = content
 
+    def update_previous_content(self, position):
+        previous_content = ''
+        for Treasure in self.Treasures:
+            if Treasure.position == position:
+                 previous_content = 'T({count})'.format(
+                    count=Treasure.count
+                )
+        return previous_content
+
     @property
     def get_leaderboard(self):
         leaderboard = {}
@@ -182,13 +196,21 @@ class RunTreasureMap(object):
 
         Treasure_map = TreasureMap(dimensions, mountains, treasures, adventurers)
 
+        init_treasures = []
+
+        for Treasure in Treasure_map.get_treasures:
+            init_treasures.append({
+                'position': Treasure.position,
+                'count': Treasure.count
+            })
+
         init_treasure_map = Treasure_map.get_treasure_map
         init_leaderboard = Treasure_map.get_leaderboard
         turn_count = Treasure_map.get_turn_count
         turn = 0
 
         self.turns[0] = {
-            'treasures': treasures,
+            'treasures': init_treasures,
             'adventurers': adventurers,
             'treasure_map': init_treasure_map,
             'leaderboard': init_leaderboard,
@@ -202,6 +224,7 @@ class RunTreasureMap(object):
 
             # For each turn, move adventurers one after the others
             for Adventurer in Adventurers:
+
                 position = Adventurer.position
                 action = Adventurer.get_turn_action(turn)
                 next_position = Adventurer.get_next_position(action)
@@ -214,16 +237,21 @@ class RunTreasureMap(object):
 
                     # Handle adventurer movement
                     if position != next_position:
+                        previous_position_content = Treasure_map.update_previous_content(position)
                         Adventurer.update_position(next_position)
                         Treasure_map.update_adventurer_position(Adventurer.name, next_position)
 
+                        Treasure_map.update_content(position, previous_position_content)
+
                         # Handle treasure picking
-                        if next_position_content == 'T':
+                        if 'T' in next_position_content:
                             Treasure = Treasure_map.get_treasure(next_position)
                             new_content = Treasure.loot_treasure(next_position)
 
                             Treasure_map.update_content(next_position, new_content)
                             Treasure_map.update_leaderboard(Adventurer.name)
+                        else:
+                            Treasure_map.update_content(next_position, 'A')
 
                 else:
                     continue
