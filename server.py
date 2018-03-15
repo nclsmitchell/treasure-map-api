@@ -86,21 +86,6 @@ def get_turn(turn):
     return jsonify(response), 200
 
 
-@app.route('/map/final', methods=['POST'])
-def get_final_state(turn):
-    values = request.get_json()
-
-    # Check that the required fields are in the POST'ed data
-    required = ['C', 'M', 'T', 'A']
-    if not all(k in values for k in required):
-        return 'Missing values', 400
-
-    # Get treasure map at step `turn`
-    response = treasure_map.RunTreasureMap(values['C'], values['M'], values['T'], values['A']).get_final_state
-
-    return jsonify(response), 200
-
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)

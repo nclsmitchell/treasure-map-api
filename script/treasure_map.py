@@ -169,9 +169,12 @@ class TreasureMap(object):
         previous_content = ''
         for Treasure in self.Treasures:
             if Treasure.position == position:
-                 previous_content = 'T({count})'.format(
-                    count=Treasure.count
-                )
+                if Treasure.count == 0:
+                    previous_content = ''
+                else:
+                    previous_content = 'T({count})'.format(
+                        count=Treasure.count
+                    )
         return previous_content
 
     @property
@@ -196,6 +199,7 @@ class RunTreasureMap(object):
 
         Treasure_map = TreasureMap(dimensions, mountains, treasures, adventurers)
 
+        # Get initial state information
         init_treasures = []
 
         for Treasure in Treasure_map.get_treasures:
@@ -217,6 +221,7 @@ class RunTreasureMap(object):
             'turn_count': turn_count
         }
 
+        # Run all turns
         while turn < turn_count:
             turn_treasures = []
             turn_adventurers = []
@@ -225,10 +230,12 @@ class RunTreasureMap(object):
             # For each turn, move adventurers one after the others
             for Adventurer in Adventurers:
 
+                # Get adventurer state
                 position = Adventurer.position
                 action = Adventurer.get_turn_action(turn)
                 next_position = Adventurer.get_next_position(action)
 
+                # Get environment state
                 next_position_content = Treasure_map.get_content(next_position)
                 adventurer_positions = Treasure_map.get_adventurer_positions
 
@@ -250,6 +257,8 @@ class RunTreasureMap(object):
 
                             Treasure_map.update_content(next_position, new_content)
                             Treasure_map.update_leaderboard(Adventurer.name)
+
+                        # Indicate adventurer new position on map
                         else:
                             Treasure_map.update_content(next_position, 'A')
 
@@ -285,15 +294,12 @@ class RunTreasureMap(object):
                 'turn_count': turn_count
             }
 
+            # Increment turn
             turn += 1
 
     @property
     def get_init_state(self):
         return self.turns[0]
-
-    @property
-    def get_final_state(self):
-        return self.turns[len(self.turns) - 1]
 
     def get_turn(self, turn):
         return self.turns[int(turn)]
